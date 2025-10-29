@@ -18,7 +18,7 @@ This Python automation script **significantly reduces downtime** for CloudFront 
 
 ## When to Use This Script
 
-This script is specifically designed for scenarios where **AWS Support is moving an alternate domain name** between CloudFront distributions. According to AWS documentation, there are [multiple options for moving alternate domain names](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/alternate-domain-names-move-options.html#alternate-domain-names-move-contact-support), and this automation is only useful when you need to **contact AWS Support** to perform the move.
+This script is specifically designed for scenarios where **AWS Support is moving an alternate domain name** between CloudFront distributions. According to AWS documentation, there are [multiple options for moving alternate domain names](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/alternate-domain-names-move-options.html#alternate-domain-names-move-contact-support), and this automation is useful when you need to **contact AWS Support** to perform the move.
 
 **Use this script when:**
 - You need AWS Support to move an alternate domain name between distributions
@@ -33,17 +33,17 @@ For more details on when AWS Support assistance is required, see: [Contact AWS S
 
 When AWS Support performs a CNAME swap between CloudFront distributions, TLS connections break immediately after the swap until the customer updates their DNS record to point to the new distribution. This creates downtime that can be problematic for applications with strict uptime requirements.
 
-## Downtime Reduction Solution
+## Lower Downtime during alternate domain updates
 
-This **Python-powered automation** transforms manual CNAME migrations into streamlined, low-downtime operations:
+This **Python-powered automation** simplfies CNAME migration, lowers the downtime and eliminates manual errors:
 
 1. **Parameter Validation** - Validates all required parameters exist and are non-empty
 2. **Domain Verification** - Confirms the provided CloudFront domain matches the actual distribution
-3. **Real-time Monitoring** - Continuously polls the target CloudFront distribution for alias changes
+3. **Real-time Monitoring** - Continuously polls (with delay and jitter) the target CloudFront distribution for alias changes
 4. **IPv6 Detection** - Automatically detects if IPv6 is enabled on the distribution
 5. **Instant Detection** - Identifies the moment AWS Support completes the CNAME swap
 6. **Automated DNS Updates** - Immediately updates Route 53 records (A and/or AAAA) using UPSERT operations
-7. **API Protection** - Uses jitter (10-15 second intervals) to protect CloudFront API from rate limiting
+
 
 ## Prerequisites
 
@@ -87,7 +87,7 @@ python3 cloudfront_dns_automation.py EZDLMTR1D3MHD Z00646902JW6C5QG3Q2NG d2mz62f
 - Displays IPv6 status of the distribution
 
 ### Monitoring Phase
-- Polls the CloudFront distribution every 10-15 seconds (with random jitter)
+- Polls the CloudFront distribution every 3-8 seconds (with random jitter)
 - Waits for the specified alias to appear in the distribution's aliases
 - Provides clear status messages during the wait
 
@@ -108,9 +108,9 @@ Both record types point to the same CloudFront domain and use the CloudFront hos
 ## API Protection
 
 To protect the CloudFront API from rate limiting:
-- Base delay of 10 seconds between API calls
+- Base delay of 3 seconds between API calls
 - Random jitter of 0-5 seconds added to each delay
-- Total delay ranges from 10-15 seconds between requests
+- Total delay ranges from 3-8 seconds between requests
 - Prevents thundering herd problems when multiple instances run
 
 ## Cross-Account Support
